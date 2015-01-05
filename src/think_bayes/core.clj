@@ -27,17 +27,13 @@
     dist
     (assoc dist hypo (* (hypo dist) likelihood))))
 
-(defn likelihood [mixes hypo data]
-  "Computes the likelihood of the data given the hypo and mixes map."
-  (data (hypo mixes)))
-
-(defn update-prob [dist mixes data]
-  "Generates a new distribution based on the mixes and given data."
+(defn update-prob [dist like-fn data]
+  "Generates a new distribution based on the likelihood function, like-fn, and given data."
   (let [updated-dist (loop [hypos (keys dist)
                             mod-dist dist]
                        (if (empty? hypos)
                          mod-dist
                          (recur 
-                           (rest hypos)
-                           (mult mod-dist (first hypos) (likelihood mixes (first hypos) data)))))]
+                            (rest hypos)
+                            (mult mod-dist (first hypos) (like-fn (first hypos) data)))))]
     (normalize updated-dist)))

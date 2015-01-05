@@ -15,5 +15,16 @@
 ; Cookie problem example using the bayesian framework
 (defn cookie-problem2 []
   (let [test-dist (distribution ["bowl1" "bowl2"])
-        mixes {:bowl2 {:choc 0.5, :van 0.5}, :bowl1 {:choc 0.25, :van 0.75}}]
-    (println "Posterior distribution = " (update-prob test-dist mixes :van))))
+        mixes {:bowl2 {:choc 0.5, :van 0.5}, :bowl1 {:choc 0.25, :van 0.75}}
+        like-fn (fn [h d]
+                  (d (h mixes)))]
+    (println "Posterior distribution = " (update-prob test-dist like-fn :van))))
+
+(defn monty-hall-problem [door-choice]
+  (let [monty-dist (distribution ["A" "B" "C"])
+        like-fn (fn [h d]
+                  (cond
+                    (= h d) 0
+                    (= h :A) 0.5
+                    :else 1))]
+    (println "Posterior distribution = " (update-prob monty-dist like-fn door-choice))))

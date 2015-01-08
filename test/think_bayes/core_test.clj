@@ -15,11 +15,12 @@
 ; Cookie problem example using the bayesian framework
 (defn cookie-problem2 []
   (let [test-dist (distribution ["bowl1" "bowl2"])
-        mixes {:bowl2 {:choc 0.5, :van 0.5}, :bowl1 {:choc 0.25, :van 0.75}}
+        mixes {:bowl2 {:choc 0.5, :van 0.5} :bowl1 {:choc 0.25, :van 0.75}}
         like-fn (fn [h d]
                   (d (h mixes)))]
     (println "Posterior distribution = " (update-prob test-dist like-fn :van))))
 
+; Implementation of the Monty-Hall problem in Section 2.5.
 (defn monty-hall-problem [door-choice]
   (let [monty-dist (distribution ["A" "B" "C"])
         like-fn (fn [h d]
@@ -28,3 +29,35 @@
                     (= h :A) 0.5
                     :else 1))]
     (println "Posterior distribution = " (update-prob monty-dist like-fn door-choice))))
+
+(defn remove-cookie [bowl-mix bowl-key flavor]
+  "Removes a cookie with flavor from the bowl with key bowl-key."
+  (swap! bowl-mix (fn [x] (update-in x [bowl-key flavor] dec))))
+
+(defn cookie-ratio-map [cookie-mix-map]
+  "Function that takes a cookie-mix-map that has counts of cookies and turns them into ratios."
+  (loop [bowls (keys cookie-mix-map)
+         new-map {}]
+    (if (empty? bowls)
+      new-map
+      (let [curr-hypo-map ((first bowls) cookie-mix-map)
+            total (apply + (vals curr-hypo-map))
+            curr-ratio-map (assoc {}
+                                  :van (float (/ (:van curr-hypo-map) total)) 
+                                  :choc (float (/ (:choc curr-hypo-map) total)))]
+        (recur (rest bowls) (assoc new-map (first bowls) curr-ratio-map))))))
+
+; Exercise 2.1 - Cookie problem *without* replacement.
+(defn cookie-problem-noreplace []
+  (let [mixes [(atom {:bowl2 {:choc 20, :van 20} :bowl1 {:choc 10, :van 30}}) ; bowl1
+               (atom {:bowl2 {:choc 20, :van 20}, :bowl1 {:choc 10, :van 30}})] ; bowl2
+        ;total-choc (apply + (map :choc (vals mixes)))
+        ;total-van (apply + (map :van (vals mixes)))
+        like-fn (fn [h d]
+                  (if (= h :bowl1)
+                    "bowl1 likelihood"
+                    "bowl2 likelihood"))]
+    ))
+
+; potentially useful snippet for modifying element of an "atomized" map:
+; (swap! mix1 (fn [m] (update-in m [:bowl1 :choc] dec)))

@@ -48,16 +48,24 @@
         (recur (rest bowls) (assoc new-map (first bowls) curr-ratio-map))))))
 
 ; Exercise 2.1 - Cookie problem *without* replacement.
-(defn cookie-problem-noreplace []
-  (let [mixes [(atom {:bowl2 {:choc 20, :van 20} :bowl1 {:choc 10, :van 30}}) ; bowl1
+(defn cookie-problem-noreplace [ds]
+  "Launches the cookire problem with no replacement based on a coll of data, ds."
+  (let [test-dist (distribution ["bowl1" "bowl2"])
+        mixes [(atom {:bowl2 {:choc 20, :van 20} :bowl1 {:choc 10, :van 30}}) ; bowl1
                (atom {:bowl2 {:choc 20, :van 20}, :bowl1 {:choc 10, :van 30}})] ; bowl2
-        ;total-choc (apply + (map :choc (vals mixes)))
-        ;total-van (apply + (map :van (vals mixes)))
         like-fn (fn [h d]
                   (if (= h :bowl1)
-                    "bowl1 likelihood"
-                    "bowl2 likelihood"))]
-    ))
-
-; potentially useful snippet for modifying element of an "atomized" map:
-; (swap! mix1 (fn [m] (update-in m [:bowl1 :choc] dec)))
+                    (let [like-b1 (d (h (cookie-ratio-map @(first mixes))))]
+                      (remove-cookie (first mixes) :bowl1 d)
+                      like-b1)
+                    (let [like-b2 (d (h (cookie-ratio-map @(second mixes))))] 
+                      (remove-cookie (second mixes) :bowl2 d)
+                      like-b2)))]
+    (loop [curr-ds ds
+           curr-posterior test-dist]
+      (if (empty? curr-ds)
+        curr-posterior
+        (do
+;          (println curr-posterior " mixes = " (map deref mixes))
+          (recur (rest curr-ds) (update-prob curr-posterior like-fn (first ds)))))
+      )))

@@ -7,8 +7,11 @@
 
 (defn distribution [hypos]
   "Creates a distribution with given collection of hypos and each having the same probability."
-  (normalize (zipmap (map keyword hypos)
-                (repeat (count hypos) 1))))
+  (let [ks (cond
+             (number? (first hypos)) hypos
+             (string? (first hypos)) (map keyword hypos))]
+    (normalize (zipmap ks
+                 (repeat (count hypos) 1)))))
 
 (defn set-prob [dist hypo pr]
   (assoc dist hypo pr))

@@ -65,7 +65,5 @@
            curr-posterior test-dist]
       (if (empty? curr-ds)
         curr-posterior
-        (do
-;          (println curr-posterior " mixes = " (map deref mixes))
-          (recur (rest curr-ds) (update-prob curr-posterior like-fn (first ds)))))
+        (recur (rest curr-ds) (update-prob curr-posterior like-fn (first ds))))
       )))

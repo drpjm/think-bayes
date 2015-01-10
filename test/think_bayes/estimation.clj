@@ -14,3 +14,11 @@
   (if (< h d)
     0
     (/ 1.0 h)))
+
+(defn roll [ns]
+  "Determines the probability of the type of die given a series of rolls."
+  (loop [curr-ns ns
+         curr-dist dice-distribution]
+    (if (empty? curr-ns)
+      curr-dist
+      (recur (rest curr-ns) (update-prob curr-dist dice-like-fn (first curr-ns))))))

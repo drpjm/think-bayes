@@ -17,18 +17,18 @@
   (assoc dist hypo pr))
 
 (defn prob [dist hypo]
-  (hypo dist))
+  (get dist hypo))
 
 (defn increment [dist hypo]
-  (if (nil? (hypo dist))
+  (if (nil? (get dist hypo))
     (conj dist {hypo 1})
-    (assoc dist hypo (inc (hypo dist)))))
+    (assoc dist hypo (inc (get dist hypo)))))
 
 (defn mult [dist hypo likelihood]
   "Multiplies the probability of hypo in dist by the given likelihood. Returns the distribution with updated entries."
-  (if (nil? (hypo dist))
+  (if (nil? (get dist hypo))
     dist
-    (assoc dist hypo (* (hypo dist) likelihood))))
+    (assoc dist hypo (* (get dist hypo) likelihood))))
 
 (defn update-prob [dist like-fn data]
   "Generates a new distribution based on the likelihood function, like-fn, and given data."

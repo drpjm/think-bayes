@@ -46,3 +46,19 @@
 ; The mean of the posterior is useful for minimizing mean square error!
 
 ; 3.3 Locomotive redux!
+; Original formulation needs more data to come up with anything realistic. We want to run the update-prob
+; function on a sequence of "seen" locomotives.
+(defn estimate-num-locomotives [ns dist]
+  (loop [curr-ns ns
+         curr-dist dist]
+    (if (empty? curr-ns)
+      curr-dist
+      (recur (rest curr-ns) (update-prob curr-dist locomotive-like-fn (first curr-ns))))))
+
+(let [smaller-dist (distribution (range 1 301))
+      med-dist (distribution (range 1 1001))
+      large-dist (distribution (range 1 2001))]
+  (println "Posterior means for seeing trains 60, 30, 90:" 
+           "\nsmall = " (mean (estimate-num-locomotives [60 30 90] smaller-dist))
+           "\nmed = " (mean (estimate-num-locomotives [60 30 90] med-dist))
+           "\nlarge = " (mean (estimate-num-locomotives [60 30 90] large-dist))))

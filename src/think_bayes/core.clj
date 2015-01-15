@@ -40,3 +40,7 @@
                             (rest hypos)
                             (mult mod-dist (first hypos) (like-fn (first hypos) data)))))]
     (normalize updated-dist)))
+
+(defn mean [dist]
+  (float (reduce-kv (fn [total h p]
+                     (+ total (* h p))) 0 dist)))

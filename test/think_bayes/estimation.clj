@@ -2,9 +2,9 @@
   (:require [think-bayes.core :refer :all]))
 
 ; Example of making collection of integers into strings. Old distribution function needed only strings.
-(map (fn [n] (java.lang.Integer/toString n)) [4 5])
+(map (fn [n] (java.lang.Integer/toString n)) (range 1 10 1))
 
-; Dice problem.
+; 3.1 Dice problem!
 ; Hypotheses: Five dice with different number of faces.
 ; Data: integers from 1 -> 20.
 (def dice-distribution (distribution [4 6 8 12 20]))
@@ -22,3 +22,27 @@
     (if (empty? curr-ns)
       curr-dist
       (recur (rest curr-ns) (update-prob curr-dist dice-like-fn (first curr-ns))))))
+
+; 3.2 Locomotive problem!
+; Setup: railroad numbers its locomotives as 1 -> N. You see a locomotive with a given number, n. Estimate how
+; many locomotives the company has.
+; Q: What did we know about N before we saw the data? For any N, what is the likelihood of seeing the data, n?
+; A: PRIOR, LIKELIHOOD
+(def locomotive-distribution (distribution (range 1 1001)))
+
+; If there is one company, all equally likely. Thus, the likelihood function looks just like the dice...
+(defn locomotive-like-fn [h d]
+  (if (< h d)
+    0
+    (/ 1.0 h)))
+
+; Check against graph in the book:
+(get (update-prob locomotive-distribution locomotive-like-fn 60) 60)
+(get (update-prob locomotive-distribution locomotive-like-fn 60) 180)
+(get (update-prob locomotive-distribution locomotive-like-fn 60) 900)
+
+; Right now, 60 is the most likely (of course). But is it the right goal? Let's compute the mean of the posterior:
+(mean (update-prob locomotive-distribution locomotive-like-fn 60))
+; The mean of the posterior is useful for minimizing mean square error!
+
+; 3.3 Locomotive redux!

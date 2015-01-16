@@ -3,15 +3,23 @@
 (defn normalize [dist]
   "Normalizes the dist for computing the probability of a hypo from the dist."
   (let [denom (apply + (vals dist))]
-    (reduce-kv (fn [m k v] (assoc m k (/ v denom))) {} dist)))
+    (into (sorted-map) (reduce-kv (fn [m k v] (assoc m k (/ v denom))) {} dist))))
 
-(defn distribution [hypos]
+(defn uniform-distribution [hypos]
   "Creates a distribution with given collection of hypos and each having the same probability."
   (let [ks (cond
              (number? (first hypos)) hypos
              (string? (first hypos)) (map keyword hypos))]
     (normalize (zipmap ks
-                 (repeat (count hypos) 1)))))
+                       (repeat (count hypos) 1)))))
+
+(defn power-distribution [hypos alpha]
+  "Creates a power distribution over the supplied hypotheses."
+  (let [ks (cond
+             (number? (first hypos)) hypos
+             (string? (first hypos)) (map keyword hypos))]
+    (normalize (zipmap ks
+                       (map (fn [h] (java.lang.Math/pow h (- alpha))) hypos)))))
 
 (defn set-prob [dist hypo pr]
   (assoc dist hypo pr))
@@ -44,3 +52,18 @@
 (defn mean [dist]
   (float (reduce-kv (fn [total h p]
                      (+ total (* h p))) 0 dist)))
+
+(defn percentile [dist pct-val]
+  "This function returns the value at the percentage boundary, pct, in distribution dist."
+  (let [pct (/ pct-val 100.0)
+        hs (keys dist)
+        ps (vals dist)]
+    ; A not so elegant loop-recur implementation. I would have preferred a reduce-kv version, but there is a clojure bug
+    ; with reduced inside of large map reduce-kv calls.
+    (loop [curr-total (first ps)
+           curr-hs hs
+           curr-ps ps]
+      (if (>= curr-total pct)
+        (first curr-hs)
+        (recur (+ curr-total (first curr-ps)) (rest curr-hs) (rest curr-ps))))))
+

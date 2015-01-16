@@ -7,7 +7,7 @@
 ; 3.1 Dice problem!
 ; Hypotheses: Five dice with different number of faces.
 ; Data: integers from 1 -> 20.
-(def dice-distribution (distribution [4 6 8 12 20]))
+(def dice-distribution (uniform-distribution [4 6 8 12 20]))
 
 ; Likelihood: 0 if the data is larger than the hypothesis, otherwise, likelihood of 1/hypothesis.
 (defn dice-like-fn [h d]
@@ -28,7 +28,7 @@
 ; many locomotives the company has.
 ; Q: What did we know about N before we saw the data? For any N, what is the likelihood of seeing the data, n?
 ; A: PRIOR, LIKELIHOOD
-(def locomotive-distribution (distribution (range 1 1001)))
+(def locomotive-distribution (uniform-distribution (range 1 1001)))
 
 ; If there is one company, all equally likely. Thus, the likelihood function looks just like the dice...
 (defn locomotive-like-fn [h d]
@@ -55,10 +55,30 @@
       curr-dist
       (recur (rest curr-ns) (update-prob curr-dist locomotive-like-fn (first curr-ns))))))
 
-(let [smaller-dist (distribution (range 1 301))
-      med-dist (distribution (range 1 1001))
-      large-dist (distribution (range 1 2001))]
-  (println "Posterior means for seeing trains 60, 30, 90:" 
+(let [smaller-dist (uniform-distribution (range 1 301))
+      med-dist (uniform-distribution (range 1 1001))
+      large-dist (uniform-distribution (range 1 2001))]
+  (println "Uniform distributions: Posterior means for seeing trains 60, 30, 90:" 
            "\nsmall = " (mean (estimate-num-locomotives [60 30 90] smaller-dist))
            "\nmed = " (mean (estimate-num-locomotives [60 30 90] med-dist))
            "\nlarge = " (mean (estimate-num-locomotives [60 30 90] large-dist))))
+
+; 3.4 Power distribution
+; Utilizing a power distribution, rather than uniform, we can create a less sensitive prior.
+; The power distribution is based on the notion that smaller things are more likely than larger things.
+(let [smaller-dist (power-distribution (range 1 501) 1.0)
+         med-dist (power-distribution (range 1 1001) 1.0)
+         large-dist (power-distribution (range 1 2001) 1.0)]
+     (println "Power distributions: Posterior means for seeing trains 60, 30, 90:" 
+              "\nsmall = " (mean (estimate-num-locomotives [60 30 90] smaller-dist))
+              "\nmed = " (mean (estimate-num-locomotives [60 30 90] med-dist))
+              "\nlarge = " (mean (estimate-num-locomotives [60 30 90] large-dist))))
+
+; 3.5 Credible intervals
+; To generate the estimate of a data point, we typically compute an interval where there is a 90%
+; chance that value falls within the interval.
+(let [smaller-dist (power-distribution (range 1 501) 1.0)
+      estimated-dist (estimate-num-locomotives [60 30 90] smaller-dist)]
+  (println "Percentile boundaries for small train distribution:\n5th = "
+           (percentile estimated-dist 5) "\n95th = "
+           (percentile estimated-dist 95)))

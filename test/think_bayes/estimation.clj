@@ -1,5 +1,6 @@
 (ns think-bayes.estimation
-  (:require [think-bayes.core :refer :all]))
+  (:require [think-bayes.core :refer :all]
+            [think-bayes.viz :refer :all]))
 
 ; Example of making collection of integers into strings. Old distribution function needed only strings.
 (map (fn [n] (java.lang.Integer/toString n)) (range 1 10 1))

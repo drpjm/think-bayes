@@ -67,3 +67,21 @@
         (first curr-hs)
         (recur (+ curr-total (first curr-ps)) (rest curr-hs) (rest curr-ps))))))
 
+(defn cdf-from-pmf [pmf-dist]
+  "Creates a cumulative distribution function from a provided probability mass function (distribution)."
+  (loop [vs (keys pmf-dist)
+         ps (vals pmf-dist)
+         curr-sum 0.0
+         cdf {:vals [] :probs []}]
+    (if (empty? vs)
+      cdf
+      (recur (rest vs) 
+             (rest ps)
+             (+ curr-sum (first ps))
+             (assoc cdf :vals (conj (:vals cdf) (first vs)) :probs (conj (:probs cdf) (+ curr-sum (first ps))))))))
+
+(defn value-of [cdf prob]
+  {:pre [(and (>= prob 0) (<= prob 1))]}
+  "Determines the value from the cdf that corresponds with desired probability, prob."
+  ; Placeholder...
+  (println cdf prob))

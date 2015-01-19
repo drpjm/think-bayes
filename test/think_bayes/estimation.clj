@@ -83,3 +83,6 @@
   (println "Percentile boundaries for small train distribution:\n5th = "
            (percentile estimated-dist 5) "\n95th = "
            (percentile estimated-dist 95)))
+
+; 3.6 Cumulative distribution functions (cdf)
+; CDFs allow you to compute percentiles more easily. CDFs and PMFs can be converted into each other.

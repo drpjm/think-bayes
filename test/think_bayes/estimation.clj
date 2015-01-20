@@ -86,3 +86,6 @@
 
 ; 3.6 Cumulative distribution functions (cdf)
 ; CDFs allow you to compute percentiles more easily. CDFs and PMFs can be converted into each other.
+(let [smaller-dist (power-distribution (range 1 51) 1.0)]
+  (println "Probability of selecting 20 or less: " 
+           (prob-of (cdf-from-pmf smaller-dist) 20)))

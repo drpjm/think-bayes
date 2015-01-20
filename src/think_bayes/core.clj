@@ -80,8 +80,8 @@
              (+ curr-sum (first ps))
              (assoc cdf :vals (conj (:vals cdf) (first vs)) :probs (conj (:probs cdf) (+ curr-sum (first ps))))))))
 
-(defn value-of [cdf prob]
-  {:pre [(and (>= prob 0) (<= prob 1))]}
-  "Determines the value from the cdf that corresponds with desired probability, prob."
-  ; Placeholder...
-  (println cdf prob))
+(defn prob-of [cdf value]
+  {:pre [(number? value)]}
+  "Determines the probability of drawing x <= value from the cumulative distribution."
+  (let [idx (.indexOf (:vals cdf) value)]
+    (nth (:probs cdf) idx)))

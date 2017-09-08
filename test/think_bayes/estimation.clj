@@ -1,28 +1,30 @@
 (ns think-bayes.estimation
   (:require [think-bayes.core :refer :all]
-            [think-bayes.viz :refer :all]))
-
-; Example of making collection of integers into strings. Old distribution function needed only strings.
-(map (fn [n] (java.lang.Integer/toString n)) (range 1 10 1))
+            [think-bayes.viz :refer :all]
+            [think-bayes.util :refer :all]))
 
 ; 3.1 Dice problem!
 ; Hypotheses: Five dice with different number of faces.
 ; Data: integers from 1 -> 20.
-(def dice-distribution (uniform-distribution [4 6 8 12 20]))
 
-; Likelihood: 0 if the data is larger than the hypothesis, otherwise, likelihood of 1/hypothesis.
 (defn dice-like-fn [h d]
+  "Likelihood: 0 if the data is larger than the hypothesis, otherwise, likelihood of 1/hypothesis." 
   (if (< h d)
     0
     (/ 1.0 h)))
 
-(defn roll [ns]
-  "Determines the probability of the type of die given a series of rolls."
+(defn roll [ns dice-dist]
+  "Determines the probability of the type of die given a series of rolls and dice distribution."
   (loop [curr-ns ns
-         curr-dist dice-distribution]
+         curr-dist dice-dist]
     (if (empty? curr-ns)
       curr-dist
       (recur (rest curr-ns) (update-prob curr-dist dice-like-fn (first curr-ns))))))
+
+; Run with [4 6 8 12 20] for the types of dice
+(defn run-dice-problem [dice data]
+  (let [dice-distribution (uniform-distribution dice)]
+    (print (roll data dice-distribution))))
 
 ; 3.2 Locomotive problem!
 ; Setup: railroad numbers its locomotives as 1 -> N. You see a locomotive with a given number, n. Estimate how
@@ -68,12 +70,12 @@
 ; Utilizing a power distribution, rather than uniform, we can create a less sensitive prior.
 ; The power distribution is based on the notion that smaller things are more likely than larger things.
 (let [smaller-dist (power-distribution (range 1 501) 1.0)
-         med-dist (power-distribution (range 1 1001) 1.0)
-         large-dist (power-distribution (range 1 2001) 1.0)]
-     (println "Power distributions: Posterior means for seeing trains 60, 30, 90:" 
-              "\nsmall = " (mean (estimate-num-locomotives [60 30 90] smaller-dist))
-              "\nmed = " (mean (estimate-num-locomotives [60 30 90] med-dist))
-              "\nlarge = " (mean (estimate-num-locomotives [60 30 90] large-dist))))
+      med-dist (power-distribution (range 1 1001) 1.0)
+      large-dist (power-distribution (range 1 2001) 1.0)]
+  (println "Power distributions: Posterior means for seeing trains 60, 30, 90:" 
+           "\nsmall = " (mean (estimate-num-locomotives [60 30 90] smaller-dist))
+           "\nmed = " (mean (estimate-num-locomotives [60 30 90] med-dist))
+           "\nlarge = " (mean (estimate-num-locomotives [60 30 90] large-dist))))
 
 ; 3.5 Credible intervals
 ; To generate the estimate of a data point, we typically compute an interval where there is a 90%

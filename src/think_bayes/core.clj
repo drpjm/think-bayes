@@ -1,12 +1,12 @@
 (ns think-bayes.core)
 
 (defn normalize [dist]
-  "Normalizes the dist for computing the probability of a hypo from the dist."
+  "Normalizes the dist for computing the probability of a hypothesis from the distribution."
   (let [denom (apply + (vals dist))]
     (into (sorted-map) (reduce-kv (fn [m k v] (assoc m k (/ v denom))) {} dist))))
 
 (defn uniform-distribution [hypos]
-  "Creates a distribution with given collection of hypos and each having the same probability."
+  "Creates a distribution with given collection of hypotheses (hypos) and each having the same probability."
   (let [ks (cond
              (number? (first hypos)) hypos
              (string? (first hypos)) (map keyword hypos))]
@@ -14,7 +14,7 @@
                        (repeat (count hypos) 1)))))
 
 (defn power-distribution [hypos alpha]
-  "Creates a power distribution over the supplied hypotheses."
+  "Creates a power distribution over the supplied hypotheses (hypos)."
   (let [ks (cond
              (number? (first hypos)) hypos
              (string? (first hypos)) (map keyword hypos))]
@@ -33,13 +33,14 @@
     (assoc dist hypo (inc (get dist hypo)))))
 
 (defn mult [dist hypo likelihood]
-  "Multiplies the probability of hypo in dist by the given likelihood. Returns the distribution with updated entries."
+  "Multiplies the probability of hypothesis (hypo) in distribution (dist) by the given likelihood. 
+Returns the distribution with updated entries."
   (if (nil? (get dist hypo))
     dist
     (assoc dist hypo (* (get dist hypo) likelihood))))
 
 (defn update-prob [dist like-fn data]
-  "Generates a new distribution based on the likelihood function, like-fn, and given data."
+  "Generates a new distribution based on the likelihood function (like-fn) and given data."
   (let [updated-dist (loop [hypos (keys dist)
                             mod-dist dist]
                        (if (empty? hypos)
@@ -59,7 +60,7 @@
         hs (keys dist)
         ps (vals dist)]
     ; A not so elegant loop-recur implementation. I would have preferred a reduce-kv version, but there is a clojure bug
-    ; with reduced inside of large map reduce-kv calls.
+    ; with reduce inside of large map reduce-kv calls.
     (loop [curr-total (first ps)
            curr-hs hs
            curr-ps ps]

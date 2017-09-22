@@ -114,7 +114,8 @@
 (defn run-euro-flip [data]
   (let [heads-dist (uniform-distribution (range 0 101))
         new-dist (estimate-with-data heads-dist euro-likelihood flip-data)]
-    (plot-distribution new-dist)))
-
+    (plot-distribution new-dist)
+    new-dist))
+; Note that the probability in this estimated distribution is meaningless on its own!
 
 

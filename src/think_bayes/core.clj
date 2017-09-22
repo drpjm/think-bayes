@@ -39,18 +39,6 @@ Returns the distribution with updated entries."
     dist
     (assoc dist hypo (* (get dist hypo) likelihood))))
 
-; Deprecated for idiomatic reduce-kv version.
-;(defn update-prob [dist like-fn data]
-;  "Generates a new distribution based on the current distribution (dist), likelihood function (like-fn) and given data."
-;  (let [updated-dist (loop [hypos (keys dist)
-;                            mod-dist dist]
-;                       (if (empty? hypos)
-;                         mod-dist
-;                         (recur 
-;                            (rest hypos)
-;                            (mult mod-dist (first hypos) (like-fn (first hypos) data)))))]
-;    (normalize updated-dist)))
-
 (defn update-prob [dist like-fn data]
   "Generates a new distribution based on the current distribution (dist), likelihood function (like-fn) and given data."
   (let [updated-dist (reduce-kv 
